@@ -172,14 +172,6 @@ nav.tabs button[aria-current="page"] { color: var(--pine); background: var(--sof
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 90; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 600; max-width: calc(100% - 32px); text-align: center; }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: pop .18s ease-out; } @keyframes pop { from { opacity: 0; transform: translate(-50%, 8px); } } }
 
-/* Фотографии для каталога, рецептов и недельного плана. */
-.art { position:relative; }
-.photo-wrap { display:block; position:absolute; inset:0; overflow:hidden; background:var(--soft); }
-.photo-wrap > img { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
-.photo-wrap > img[hidden], .photo-fallback[hidden] { display:none!important; }
-.photo-fallback, .photo-fallback svg { display:block; width:100%; height:100%; }
-.row .thumb { position:relative; }
-.row .thumb .photo-wrap { position:absolute; inset:0; }
 </style>
 
 <header class="top"><div class="wrap">
@@ -292,20 +284,10 @@ function art(d) {
 
 /* ---------- экраны ---------- */
 
-/* Иллюстративные фото Pexels (https://www.pexels.com/license/).
-   Для похожих блюд фото могут повторяться. При ошибке загрузки — SVG. */
-const PHOTO_IDS = {"bolon":6287525,"carbo":31779533,"flot":5688249,"sosistom":128408,"pastachick":1438672,"maccheese":7474121,"grechkot":34636456,"grechfarsh":5863614,"ricechick":24738519,"friedrice":20891782,"ezhiki":38934831,"grechsos":6066052,"pyure":34636456,"nozhka":12916870,"kartegg":24513374,"chickcream":24778216,"chicksoy":12916874,"chickballs":5863614,"kotlhome":34636456,"soupchick":28872869,"soupfric":12077982,"souptom":34326259,"pelmsm":8601557,"pelmfry":7287702,"pelmtom":8023859,"vareniki":37225178,"shakshuka":691077,"omelet":26341187,"yaichsos":691077,"syrniki":34326259,"rollnug":12916870,"rollchick":6066052,"quesa":7287716,"hotdog":12916870,"burger":12916874,"cheesenoodle":7474121,"creamsoup":28872869,"cheesesoup":34326259,"tomcream":34326259,"cheeseburgerpasta":6287520,"risotto":26341175,"nuggetshome":12916870,"pizzapan":24513374,"shaurmafarsh":12916874,"grilledcheese":7474121,"potatocheese":12916870,"woknoodles":31150263,"ramen":37173532,"pelmcream":7287702,"chickpotcream":12916870,"potatosoup":34326259,"burgerbowl":24778216,"crispywrap":12916870,"sosiscream":1438672,"mcegg":34636456,"chicken-taco":6066052,"smash-taco":12916874,"gyros-chicken":12916870,"pizza-roll":1438672,"loaded-potato":12916870,"mexican-rice":24738519,"fajita-wrap":6066052,"chicken-club":34636456};
-function dishImage(d) {
-  const id = PHOTO_IDS[d.id];
-  if (!id) return art(d);
-  const url = 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&w=900';
-  return '<span class="photo-wrap"><img src="' + url + '" alt="' + esc(d.name) + ' — иллюстративное фото" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="photo-fallback" hidden>' + art(d) + '</span></span>';
-}
-
 function card(d) {
   const n = nutri(d), on = !!inWeek(d.id);
   return `<div class="dish" style="--h:${HUE[d.base]}"><button data-open="${d.id}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;" aria-label="Открыть: ${esc(d.name)}">
-    <span class="art">${dishImage(d)}</span><span class="body"><b>${esc(d.name)}</b><span class="nums"><i>${num(n.k)}</i> ккал · <i>${num(n.b)}</i> Б · ${d.min} мин</span></span></button>
+    <span class="art">${art(d)}</span><span class="body"><b>${esc(d.name)}</b><span class="nums"><i>${num(n.k)}</i> ккал · <i>${num(n.b)}</i> Б · ${d.min} мин</span></span></button>
     <button class="add" data-add="${d.id}" aria-pressed="${on}" aria-label="${on ? 'Убрать из недели' : 'Добавить в неделю'}">${on ? '✓' : '+'}</button></div>`;
 }
 function viewDishes() {
@@ -340,7 +322,7 @@ function viewWeek() {
 function drawSum() {
   const t = weekTotals(), m = S.prof.meals, avgK = t.k / t.por, avgB = t.b / t.por, dayK = avgK * m, dayB = avgB * m, days = t.por / m;
   const rows = S.week.map((x, i) => { const d = byId(x.id), n = nutri(d);
-    return `<div class="row" style="--h:${HUE[d.base]}"><span class="thumb">${dishImage(d)}</span><span class="t"><b>${esc(d.name)}</b><small>${num(n.k)} ккал · ${num(n.b)} Б на порцию</small></span>
+    return `<div class="row" style="--h:${HUE[d.base]}"><span class="thumb">${art(d)}</span><span class="t"><b>${esc(d.name)}</b><small>${num(n.k)} ккал · ${num(n.b)} Б на порцию</small></span>
     <span class="step"><button data-wp="${i}" data-d="-1" aria-label="Меньше">−</button><output>${x.p}</output><button data-wp="${i}" data-d="1" aria-label="Больше">+</button></span><button class="xbtn" data-rm="${i}" aria-label="Убрать">×</button></div>`; }).join('');
   return `<div class="panel"><h3>Что готовлю</h3>${rows}</div>
   <div class="panel"><h3>Хватит на ${num(days, 1)} дня</h3><p class="hint" style="margin-top:0">Если брать ${m} ${m === 1 ? 'порцию' : 'порции'} из заготовок в день.</p>
@@ -359,7 +341,7 @@ function scaleTxt(t, p) { return esc(t).replace(/\{(\d+(?:,\d+)?) ([^}]+)\}/g, (
 function drawCook() {
   const m = S.prof.perBox;
   return S.week.map(x => { const d = byId(x.id), n = Math.ceil(x.p / m); const fr = x.p > 3 ? `Первые 3 порции в холодильник, остальные ${x.p - 3} в морозилку.` : 'Всё в холодильник, съесть за 3 дня.';
-    return `<div class="panel" style="--h:${HUE[d.base]}"><div class="row" style="padding-top:0"><span class="thumb">${dishImage(d)}</span><span class="t"><b>${esc(d.name)}</b><small>${x.p} ${wPor(x.p)} · ${n} ${wBox(n)} · ${d.min} мин</small></span></div>
+    return `<div class="panel" style="--h:${HUE[d.base]}"><div class="row" style="padding-top:0"><span class="thumb">${art(d)}</span><span class="t"><b>${esc(d.name)}</b><small>${x.p} ${wPor(x.p)} · ${n} ${wBox(n)} · ${d.min} мин</small></span></div>
     <ol class="steps" style="margin:0;border:0;padding:0">${d.steps.map(s => `<li>${scaleTxt(s, x.p)}</li>`).join('')}</ol>
     <div class="tip">${fr}</div></div>`; }).join('') + `<p class="hint">Все количества возьми из списка покупок или из рецепта в режиме «На заготовку».</p>`;
 }
@@ -404,7 +386,7 @@ function drawSheet(top) {
     if (it.g == null) return `<div class="r"><span class="nm">${esc(it.n)}</span>${amtText(it, 1)}</div>`;
     const ctl = R.mode === 'one' ? `<span class="step"><button data-ig="${it.i}" data-d="-1" aria-label="Меньше">−</button><input inputmode="decimal" data-iv="${it.i}" value="${num(it.g)}" aria-label="${esc(it.n)}, граммы"><button data-ig="${it.i}" data-d="1" aria-label="Больше">+</button></span>` : amtText(it, mult);
     return `<div class="r ${it.g === 0 ? 'off' : ''}"><span class="nm">${esc(it.n)}<small>${rn ? `${num(rn.b)} Б · ${num(rn.k)} ккал` : (it.changed ? 'изменено' : '')}${it.note ? (rn ? ' · ' : '') + esc(it.note) : ''}</small></span>${ctl}</div>`; }).join('');
-  $('#sheet').innerHTML = `<div class="hd" style="--h:${HUE[d.base]}"><span class="art">${dishImage(d)}</span><button class="back" data-act="back" aria-label="Назад">←</button></div>
+  $('#sheet').innerHTML = `<div class="hd" style="--h:${HUE[d.base]}"><span class="art">${art(d)}</span><button class="back" data-act="back" aria-label="Назад">←</button></div>
   <div class="wrap"><div class="in"><h1>${esc(d.name)}</h1><div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
   <div class="kbju"><div class="k"><b>${num(n.k)}</b><small>ккал</small></div><div><b>${num(n.b)}</b><small>белки, г</small></div><div><b>${num(n.f)}</b><small>жиры, г</small></div><div><b>${num(n.c)}</b><small>углеводы, г</small></div></div>
   <p class="hint">КБЖУ на одну порцию, приблизительно.</p>
