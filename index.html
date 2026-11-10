@@ -648,8 +648,8 @@ document.addEventListener('click', e => {
   else if (a === 'uncheck') { S.done = {}; save(); render(); }
   else if (a === 'copy') {
     const txt = shopping().map(([n, arr]) => n + '\n' + arr.map(x => `${S.done[x.k] ? '✓' : '•'} ${LBL[x.k]} ${qty(x.k, x.g)}`).join('\n')).join('\n\n');
-    const extra = S.custom.map(x => (x.done?'✓ ':'• ') + x.name).join('\\n');
-    const allText = txt + (extra ? '\\n\\nДополнительно\\n' + extra : '');
+    const extra = S.custom.map(x => (x.done?'✓ ':'• ') + x.name).join('\n');
+    const allText = txt + (extra ? '\n\nДополнительно\n' + extra : '');
     (navigator.clipboard ? navigator.clipboard.writeText(allText) : Promise.reject()).then(() => toast('Список скопирован'), () => toast('Не получилось скопировать'));
   }
 });
